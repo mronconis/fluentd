@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+
+  zookeeper:
+    image: strimzi/kafka:0.20.0-kafka-2.6.0
+    command: [
+      "sh", "-c", "bin/zookeeper-server-start.sh config/zookeeper.properties"
+    ]
+    ports:
+      - "2181:2181"
+    environment:
+      LOG_DIR: /tmp/logs
+
+  kafka:
+    image: strimzi/kafka:0.20.0-kafka-2.6.0
+    command: [
+      "sh", "-c", "bin/kafka-server-start.sh config/server.properties --override listeners=$${KAFKA_LISTENERS} --override advertised.listeners=$${KAFKA_ADVERTISED_LISTENERS} --override zookeeper.connect=$${KAFKA_ZOOKEEPER_CONNECT}"
+    ]
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      LOG_DIR: "/tmp/logs"
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+
+  fluentd:
+    build: ./image
+    image: fluentd-kafka:latest
+    depends_on:
+      - kafka
+    ports:
+      - "24231:24231"
+    environment:
+      FLUENTD_CONF: fluentd.conf
+      FLUENTD_LOGLEVEL: debug
+      KAFKA_BOOTSTRAP_SERVER: kafka:9092
+      KAFKA_TOPIC: access-logs-topic
+      KAFKA_DEFAULT_TOPIC: default-logs-topic
+    volumes:
+      - ${PWD}:/fluentd/etc:ro
+      - ${PWD}/test:/logs:rw
+  
+  prometheus:
+    image: prom/prometheus:v2.30.3
+    depends_on:
+      - fluentd
+    ports:
+      - 9000:9090
+    volumes:
+      - ${PWD}:/etc/prometheus
+      - ${PWD}/test/prometheus:/prometheus
+    command: --web.enable-lifecycle  --config.file=/etc/prometheus/prometheus.yml

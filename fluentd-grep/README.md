@@ -3,8 +3,11 @@
 
 Full documentation at the following link https://docs.fluentd.org/filter/grep
 
-## Configure plugin (full configuration fluentd.conf)
+## Configure 
+For the full configuration see [fluentd.conf](https://github.com/mronconis/fluentd/tree/main/fluentd-grep/fluentd.conf)
+
 ````
+  ...output omit...
   <filter sample.test>
     @type grep
 
@@ -24,19 +27,20 @@ Full documentation at the following link https://docs.fluentd.org/filter/grep
       pattern /^[0-9]+/
     </exclude>
   </filter>
+  ...output omit...
 ````
 
-## Build image fluentd
+## Build
 ````
 make build
 ````
 
-## Run container fluentd
+## Run
 ````
 make run
 ````
 
-## Send test data
+## Test
 ````
 curl -X POST -d 'json={"message":"foo bar", "code": "123"}' http://localhost:9880/sample.test
 curl -X POST -d 'json={"message":"foo bar", "code": "abc123"}' http://localhost:9880/sample.test

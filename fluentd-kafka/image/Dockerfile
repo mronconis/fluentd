@@ -1,4 +1,4 @@
-FROM fluent/fluentd:v1.11.1-1.0
+FROM fluent/fluentd:v1.15.3-1.0
 
 #----------
 USER root
@@ -15,7 +15,7 @@ RUN ["gem", "install", "fluent-plugin-multiline-parser", "--no-document"]
 RUN ["gem", "install", "thread_safe", "--no-document"]
 RUN ["gem", "install", "fluent-plugin-multi-format-parser", "--no-document"]
 RUN ["gem", "install", "fluent-plugin-kafka", "--no-document"]
-
+RUN ["gem", "install", "fluent-plugin-prometheus", "--no-document"]
 
 RUN apk del build-base
 
@@ -25,5 +25,3 @@ WORKDIR /fluentd
 
 #----------
 USER fluent
-
-RUN mkdir /tmp/access_logs

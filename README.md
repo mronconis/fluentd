@@ -3,3 +3,4 @@
 Demo projects based on docker image https://hub.docker.com/r/fluent/fluentd/
 
 - [fluentd-grep](https://github.com/mronconis/fluentd/tree/main/fluentd-grep)
+- [fluentd-kafka](https://github.com/mronconis/fluentd/tree/main/fluentd-kafka)
